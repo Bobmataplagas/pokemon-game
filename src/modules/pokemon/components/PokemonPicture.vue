@@ -2,36 +2,28 @@
     <section>
         <img
             v-if="pokemonId !== null"
-            :pokemonImage
+            :src="pokemonImage"
             alt="Silueta de un Pokémon"
-            class="brightness-0 h-[200px]"
-        />
-        <img
-            v-else
-            :pokemonImage
-            alt="Silueta de un Pokémon"
-            class="fade-in h-[200px]"
+            :class="showPokemon ? 'fade-in h-[200px]' : 'brightness-0 h-[200px]'"
         />
     </section>
 </template>
 
 <script lang="ts" setup>
-defineProps<{
-    pokemonId: number | null;
-}>();
+import { computed } from 'vue';
 
-import {computed} from 'vue';
-interface Props{
-    pokemonId: number;
+interface Props {
+    pokemonId: number | null;
     showPokemon?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(),{
+const props = withDefaults(defineProps<Props>(), {
     showPokemon: false,
 });
 
-const pokemonImage=computed(()=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`)
-
+const pokemonImage = computed(
+    () => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${props.pokemonId}.png`
+);
 </script>
 
 <style scope>

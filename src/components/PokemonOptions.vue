@@ -5,10 +5,13 @@
                 v-for="pokemon in pokemons"
                 :key="pokemon.id"
                 type="button"
-                :disabled="disabled"
-                class="capitalize text-black"
+                
                 @click="emit('select', pokemon)"
-            >
+                class="['capitalize disabled:shadow-none disabled:bg-gray-100',{
+                    correct:pokemon.id === correctAnswer && blockSelection,
+                    incorrect:pokemon.id !== correctAnswer && blockSelection
+                }]"
+                :disabled="blockSelection || disabled">
                 {{ pokemon.name }}
             </button>
         </div>
@@ -21,6 +24,8 @@ import type { Pokemon } from '@/modules/pokemon/interfaces';
 defineProps<{
     pokemons: Pokemon[];
     disabled: boolean;
+    blockSelection: boolean;
+    correctAnswer: number | null;
 }>();
 
 const emit = defineEmits<{

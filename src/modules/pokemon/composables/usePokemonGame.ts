@@ -31,6 +31,11 @@ export const usePokemonGame = () => {
         pokemonToGuess.value = pokemonOptions.value[randomIndex] ?? null;
     };
 
+    const getNextRound = (howMany: number = 4 ) => {
+        gameStatus.value = GameStatus.Playing;
+        pokemonOptions.value = pokemons.value.slice(0, howMany);
+        pokemons.value = pokemons.value.slice(howMany);
+    };
 
     // Lo montamos directamente para ver el resultado al momento en que cargue la aplicación
     onMounted(async ()=>{
@@ -47,6 +52,8 @@ export const usePokemonGame = () => {
         pokemonOptions,
         pokemonToGuess,
         // Methods
+        resetGame: () => getNextOptions(),
         getNextOptions,
+        getNextRound
     };
 }
