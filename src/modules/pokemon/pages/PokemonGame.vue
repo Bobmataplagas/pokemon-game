@@ -5,6 +5,11 @@
     </section>
 
     <section v-else class="flex flex-col justify-center items-center w-screen h-screen">
+        <h1 class="color-text" style="padding-bottom: 1%;">¿Quién es este Pokémon?</h1>
+        <div class="mb-4 flex gap-6 text-center" aria-label="Estadísticas del juego">
+            <p class="color-text1">Rondas jugadas: <strong>{{ roundsPlayed }}</strong></p>
+            <p class="color-text2">Rondas ganadas: <strong>{{ roundsWon }}</strong></p>
+        </div>
         <div
             v-if="gameStatus === GameStatus.Won"
             class="confetti-container"
@@ -24,15 +29,16 @@
                 }"
             />
         </div>
-        <h1 class="mt-5">¿Quién es este Pokémon?</h1>
-        <h3 class="capitalize">{{ gameStatus }}</h3>
-        <div class="h-20">
-            <button v-if="gameStatus !== GameStatus.Playing" @click="resetGame">
+        <div>
+            <button v-if="gameStatus !== GameStatus.Playing" @click="resetGame" class="bg-red-500 text-white p-2 rounded-md hover:bg-pink-700 transition-all">
                 Jugar de nuevo
             </button>
         </div>
         <!-- Pokémon Picture -->
-        <PokemonPicture :pokemon-id="pokemonToGuess?.id ?? null" />
+        <PokemonPicture
+            :pokemon-id="pokemonToGuess?.id ?? null"
+            :show-pokemon="gameStatus === GameStatus.Won"
+        />
         <!-- Pokémon Options-->
         <PokemonOptions
             :pokemons="pokemonOptions"
@@ -69,24 +75,50 @@ import PokemonOptions from '@/components/PokemonOptions.vue';
 import PokemonPicture from '../components/PokemonPicture.vue';
 import { usePokemonGame } from '../composables/usePokemonGame.ts';
 import { GameStatus, type Pokemon } from '../interfaces';
-const { gameStatus, isLoading, pokemonOptions, pokemonToGuess, resetGame } = usePokemonGame();
+const { gameStatus, isLoading, pokemonOptions, pokemonToGuess, resetGame: startNextRound } = usePokemonGame();
 const confettiColors = ['#f43f5e', '#eab308', '#22c55e', '#3b82f6', '#a855f7'];
 const isIncorrectAnswer = ref(false);
 const incorrectAnswerAttempts = ref(0);
+const roundsPlayed = ref(0);
+const roundsWon = ref(0);
 
 const checkAnswer = (pokemon: Pokemon) => {
+    if (gameStatus.value !== GameStatus.Playing) return;
+
+    roundsPlayed.value++;
+
     if (pokemon.id === pokemonToGuess.value?.id) {
         isIncorrectAnswer.value = false;
+        roundsWon.value++;
         gameStatus.value = GameStatus.Won;
         return;
     }
 
     isIncorrectAnswer.value = true;
     incorrectAnswerAttempts.value++;
+    gameStatus.value = GameStatus.Lost;
+};
+
+const resetGame = () => {
+    isIncorrectAnswer.value = false;
+    startNextRound();
 };
 </script>
 
 <style scoped>
+.color-text{
+    color: #0400ff;
+    font-size: 2.0rem
+}
+
+.color-text1{
+    color: #e100ff;
+}
+
+.color-text2{
+    color: #00ca76;
+}
+
 .correct-answer,
 .incorrect-answer {
     margin-top: 1rem;
